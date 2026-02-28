@@ -56,18 +56,8 @@
 
               <!-- いいね -->
               <td class="text-center">
-                <% if book.favorited_by?(current_user) %>
-                  <%= link_to book_favorite_path(book),
-                              data: { turbo_method: :delete },
-                              class: "text-danger text-decoration-none" do %>
-                    ❤️ <%= book.favorites.count %>
-                  <% end %>
-                <% else %>
-                  <%= link_to book_favorite_path(book),
-                              data: { turbo_method: :post },
-                              class: "text-muted text-decoration-none" do %>
-                    💙 <%= book.favorites.count %>
-                  <% end %>
+                <%= turbo_frame_tag dom_id(book, :favorite) do %>
+                  <%= render "favorites/favorite_btn", book: book %>
                 <% end %>
               </td>
 

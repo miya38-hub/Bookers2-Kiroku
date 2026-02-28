@@ -35,18 +35,10 @@
               <%= @book.body %>
             </td>
 
-            <!-- いいね -->
+            <!-- いいね（Turboで差し替え） -->
             <td class="align-middle text-center">
-              <% if @book.favorited_by?(current_user) %>
-                <%= link_to "❤️#{@book.favorites.count}",
-                            book_favorite_path(@book),
-                            data: { turbo_method: :delete },
-                            class: "text-danger text-decoration-none fs-5" %>
-              <% else %>
-                <%= link_to "💙#{@book.favorites.count}",
-                            book_favorite_path(@book),
-                            data: { turbo_method: :post },
-                            class: "text-muted text-decoration-none fs-5" %>
+              <%= turbo_frame_tag dom_id(@book, :favorite) do %>
+                <%= render "favorites/favorite_btn", book: @book %>
               <% end %>
             </td>
 
@@ -116,7 +108,7 @@
 <% end %>
 
 <div class="mt-4">
-  <%= form_with model: [@book, @book_comment], local: true do |f| %>
+  <%= form_with model: [@book, @book_comment] do |f| %>
     <div class="mb-2">
       <%= f.text_area :comment, rows: 3, placeholder: "コメントを書く", class: "form-control" %>
     </div>

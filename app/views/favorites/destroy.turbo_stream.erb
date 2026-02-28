@@ -1,0 +1,3 @@
+<%= turbo_stream.replace dom_id(@book, :favorite),
+      partial: "favorites/favorite_btn",
+      locals: { book: @book } %>
