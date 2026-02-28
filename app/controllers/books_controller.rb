@@ -32,9 +32,25 @@ end
   end
 
   def index
-    @books = Book.all
-    @book = Book.new 
-    @user  = current_user
+    from = 1.week.ago.beginning_of_day
+    to   = Time.current.end_of_day
+
+    join_sql = ActiveRecord::Base.send(
+      :sanitize_sql_array,
+      ["LEFT JOIN favorites ON favorites.book_id = books.id AND favorites.created_at BETWEEN ? AND ?", from, to]
+    )
+
+    base = Book
+      .joins(join_sql)
+      .select("books.*, COUNT(favorites.id) AS weekly_favorites_count")
+      .group("books.id")
+      .order("weekly_favorites_count DESC")
+
+    @books = base.includes(:user) # 一覧表示用（N+1防止）
+    @weekly_rank_books = base.includes(:user).limit(5) # ← ランキング用（上位5件）
+
+    @book = Book.new
+    @user = current_user
   end
 
   def show

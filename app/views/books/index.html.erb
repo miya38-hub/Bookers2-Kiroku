@@ -71,6 +71,27 @@
         </tbody>
 
       </table>
+      <div class="mt-4">
+      <h4>直近1週間 いいねが多い投稿</h4>
+
+      <table class="table table-sm">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Opinion</th>
+            <th class="text-center">週間いいね</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @weekly_rank_books.each do |book| %>
+            <tr>
+              <td><%= link_to book.title, book_path(book) %></td>
+              <td><%= truncate(book.body, length: 60) %></td>
+              <td class="text-center"><%= book.weekly_favorites_count.to_i %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
     </div>
 
   </div>
