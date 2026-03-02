@@ -5,6 +5,9 @@ class User < ApplicationRecord
   has_many :books, dependent: :destroy
   has_many :book_comments, dependent: :destroy
   has_many :favorites, dependent: :destroy
+  has_many :entries, dependent: :destroy
+  has_many :messages, dependent: :destroy
+  has_many :rooms, through: :entries
 
   has_many :active_relationships, class_name: "Relationship", foreign_key: "follower_id", dependent: :destroy
 
@@ -24,6 +27,10 @@ class User < ApplicationRecord
   
   def following?(user)
     followings.include?(user)
+  end
+
+  def mutual_follow?(user)
+    following?(user) && user.following?(self)
   end
 
   validates :name,

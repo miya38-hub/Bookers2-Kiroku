@@ -20,4 +20,7 @@ Rails.application.routes.draw do
   resource :session, only: [:new, :create, :destroy]
   resources :passwords, param: :token
 
+  resources :rooms, only: [:create, :show]
+  resources :messages, only: [:create]
+
 end

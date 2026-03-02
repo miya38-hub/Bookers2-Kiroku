@@ -1,0 +1,27 @@
+<h2>DMルーム</h2>
+
+<div class="mt-3">
+  <% @messages.each do |message| %>
+    <% is_me = (message.user_id == current_user.id) %>
+
+    <div class="d-flex <%= is_me ? 'justify-content-end' : 'justify-content-start' %> mb-2">
+      <div class="p-2 rounded border <%= is_me ? 'text-end' : '' %>" style="max-width: 70%;">
+        <div class="small text-muted">
+          <%= is_me ? "あなた" : message.user.name %>
+        </div>
+        <div><%= simple_format(h(message.content)) %></div>
+        <div class="small text-muted">
+          <%= message.created_at.strftime("%Y/%m/%d %H:%M") %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<hr>
+
+<%= form_with model: @message, url: messages_path, local: true do |f| %>
+  <%= f.hidden_field :room_id, value: @room.id %>
+  <%= f.text_area :content, maxlength: 140, class: "form-control", rows: 2 %>
+  <%= f.submit "送信", class: "btn btn-primary mt-2" %>
+<% end %>

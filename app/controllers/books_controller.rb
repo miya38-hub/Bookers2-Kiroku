@@ -59,6 +59,7 @@ end
     @user = @book.user
     @book_new = Book.new
     @book_comments = @book.book_comments.includes(:user).order(created_at: :desc)
+    @book.increment!(:views_count)
   end
 
   private

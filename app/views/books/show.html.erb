@@ -47,6 +47,10 @@
               コメント数: <%= @book.book_comments.count %>
             </td>
 
+            <td class="text-center">
+              閲覧数: <%= @book.views_count %>
+            </td>
+
             <!-- Edit（本人だけ） -->
             <td class="align-middle">
               <% if @book.user_id == current_user.id %>
