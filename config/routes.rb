@@ -7,6 +7,7 @@ Rails.application.routes.draw do
     member do
       get :following
       get :followers
+      get :daily_count
     end
   end
 

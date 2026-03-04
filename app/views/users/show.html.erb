@@ -40,7 +40,132 @@
           <% end %>
         </tbody>
       </table>
+      <div class="mt-3 p-3 border rounded bg-light">
+        <div class="d-flex gap-4 flex-wrap">
+          <div>今日の投稿数：<strong><%= @today_books_count %></strong></div>
+          <div>前日の投稿数：<strong><%= @yesterday_books_count %></strong></div>
+
+          <div>
+            前日比：
+            <% if @day_percent.nil? %>
+              <strong class="text-secondary">—</strong>
+            <% elsif @day_percent > 0 %>
+              <strong class="text-success">+<%= @day_percent %>%</strong>
+            <% elsif @day_percent < 0 %>
+              <strong class="text-danger"><%= @day_percent %>%</strong>
+            <% else %>
+              <strong class="text-secondary">±0%</strong>
+            <% end %>
+          </div>
+        </div>
+      </div>
+      <div class="mt-3 p-3 border rounded bg-light">
+        <div class="d-flex gap-4 flex-wrap">
+          <div>今週の投稿数：<strong><%= @this_week_books_count %></strong></div>
+          <div>先週の投稿数：<strong><%= @last_week_books_count %></strong></div>
+
+          <div>
+            前週比：
+            <% if @week_percent.nil? %>
+              <strong class="text-secondary">—</strong>
+            <% elsif @week_percent > 0 %>
+              <strong class="text-success">+<%= @week_percent %>%</strong>
+            <% elsif @week_percent < 0 %>
+              <strong class="text-danger"><%= @week_percent %>%</strong>
+            <% else %>
+              <strong class="text-secondary">±0%</strong>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+    <div class="mt-4">
+      <h5>過去7日間の投稿数</h5>
+
+      <table class="table table-sm text-center">
+        <thead>
+          <tr>
+            <% @daily_book_counts.each do |date, _count| %>
+              <th><%= date.strftime("%m/%d") %></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <% @daily_book_counts.each do |_date, count| %>
+              <td><%= count %></td>
+            <% end %>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="mt-4">
+      <h5>過去7日間の投稿数（グラフ）</h5>
+
+      <canvas id="postsChart" height="140"
+              data-labels="<%= @daily_book_counts.map { |d, _| d.strftime('%m/%d') }.to_json %>"
+              data-counts="<%= @daily_book_counts.map { |_, c| c }.to_json %>">
+      </canvas>
+      </div>
+      <div class="mt-4">
+        <h5>指定日の投稿数</h5>
+
+        <%= form_with url: daily_count_user_path(@user),
+                      method: :get,
+                      data: { turbo_frame: "daily_count_frame" } do |f| %>
+          <div class="d-flex gap-2 align-items-center">
+            <%= f.date_field :date, value: Time.zone.today, class: "form-control", style: "max-width: 220px;" %>
+            <%= f.submit "表示", class: "btn btn-primary" %>
+          </div>
+        <% end %>
+
+        <turbo-frame id="daily_count_frame">
+          <%= render "users/daily_count", date: Time.zone.today, count: @today_books_count %>
+        </turbo-frame>
+      </div>
+    </div>
+    
     </div>
 
   </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  function renderPostsChart() {
+    const canvas = document.getElementById("postsChart");
+    if (!canvas) return;
+
+    if (typeof Chart === "undefined") {
+      console.error("Chart.js is not loaded");
+      return;
+    }
+
+    const labels = JSON.parse(canvas.dataset.labels || "[]");
+    const counts = JSON.parse(canvas.dataset.counts || "[]");
+
+    if (canvas._chart) canvas._chart.destroy();
+
+    const ctx = canvas.getContext("2d");
+    canvas._chart = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: "投稿数",
+          data: counts,
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { beginAtZero: true, ticks: { precision: 0 } }
+        }
+      }
+    });
+  }
+
+  document.addEventListener("turbo:load", renderPostsChart);
+  document.addEventListener("DOMContentLoaded", renderPostsChart);
+</script>
