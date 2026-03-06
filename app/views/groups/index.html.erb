@@ -4,38 +4,55 @@
     <%= link_to "グループ作成", new_group_path, class: "btn btn-success" %>
   </div>
 
-  <table class="table mt-3">
+  <table class="table mt-3 align-middle">
     <thead>
       <tr>
+        <th></th>
         <th>グループ名</th>
-        <th>オーナー</th>
+        <th>紹介文</th>
+        <th>メンバー</th>
         <th></th>
       </tr>
     </thead>
+
     <tbody>
       <% @groups.each do |g| %>
         <tr>
-          <td>
-            <%= link_to g.name, group_path(g), class: "text-decoration-none" %>
 
-            <div class="mt-2">
-              <% if g.image&.attached? %>
-                <%= image_tag g.image,
-                      class: "img-fluid rounded",
-                      style: "width:120px;height:120px;object-fit:cover;" %>
-              <% else %>
-                <%= image_tag "no_image.jpg",
-                      class: "img-fluid rounded",
-                      style: "width:120px;height:120px;object-fit:cover;" %>
-              <% end %>
-            </div>
-          </td>
-          <td><%= link_to g.owner.name, user_path(g.owner), class: "text-decoration-none" %></td>
-          <td class="text-end">
-            <% if g.owner_id == current_user.id %>
-              <%= link_to "Edit", edit_group_path(g), class: "btn btn-outline-secondary btn-sm" %>
+          <!-- グループ画像 -->
+          <td style="width:140px;">
+            <% if g.image.attached? %>
+              <%= image_tag g.image,
+                    style: "width:100px;height:100px;object-fit:cover;" %>
+            <% else %>
+              <%= image_tag "no_image.jpg",
+                    style: "width:100px;height:100px;object-fit:cover;" %>
             <% end %>
           </td>
+
+          <!-- グループ名 -->
+          <td>
+            <%= link_to g.name, group_path(g), class: "fw-bold text-decoration-none" %>
+          </td>
+
+          <!-- 紹介文 -->
+          <td>
+            <%= truncate(g.introduction, length: 60) %>
+          </td>
+
+          <!-- グループ人数 -->
+          <td>
+            <%= g.group_users.count %>
+          </td>
+
+          <!-- Edit（オーナーのみ） -->
+          <td>
+            <% if g.owner_id == current_user.id %>
+              <%= link_to "Edit", edit_group_path(g),
+                    class: "btn btn-outline-secondary btn-sm" %>
+            <% end %>
+          </td>
+
         </tr>
       <% end %>
     </tbody>

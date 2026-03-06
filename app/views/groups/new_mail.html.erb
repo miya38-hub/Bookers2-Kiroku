@@ -1,0 +1,23 @@
+<div class="container px-5 px-sm-0">
+  <h2>Notice an Event</h2>
+
+  <% if flash.now[:alert] %>
+    <div class="alert alert-danger">
+      <%= flash.now[:alert] %>
+    </div>
+  <% end %>
+
+  <%= form_with url: send_mail_group_path(@group), method: :post, local: true do |f| %>
+    <div class="mb-3">
+      <label class="form-label">Title</label>
+      <%= text_field_tag :mail_title, params[:mail_title], class: "form-control" %>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Content</label>
+      <%= text_area_tag :mail_content, params[:mail_content], rows: 8, class: "form-control" %>
+    </div>
+
+    <%= submit_tag "送信", class: "btn btn-success" %>
+  <% end %>
+</div>

@@ -1,12 +1,13 @@
 class GroupsController < ApplicationController
-  before_action :set_group, only: [:show, :edit, :update]
-  before_action :require_owner, only: [:edit, :update]
+  before_action :set_group, only: [:show, :edit, :update, :new_mail, :send_mail]
+  before_action :require_owner, only: [:edit, :update, :new_mail, :send_mail]
 
   def index
     @groups = Group.includes(:owner, image_attachment: :blob).order(created_at: :desc)
   end
 
   def show
+    @group = Group.includes(:users, image_attachment: :blob).find(params[:id])
   end
 
   def new
@@ -35,6 +36,26 @@ class GroupsController < ApplicationController
     else
       render :edit, status: :unprocessable_entity
     end
+  end
+
+  def new_mail
+  end
+
+  def send_mail
+    @title = params[:mail_title]
+    @content = params[:mail_content]
+
+    if @title.blank? || @content.blank?
+      flash.now[:alert] = "タイトルと本文を入力してください"
+      render :new_mail, status: :unprocessable_entity
+      return
+    end
+
+    @group.users.where.not(email_address: nil).find_each do |user|
+      GroupMailer.notice_event(user, @group, @title, @content).deliver_now
+    end
+
+    render :send_mail_result
   end
 
   private
